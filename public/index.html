@@ -1,0 +1,78 @@
+<style>
+  :root {
+    --bg: #05060a;
+    --panel: rgba(12, 15, 24, 0.55);
+    --stroke: rgba(150, 170, 210, 0.14);
+    --text: #e9edf8;
+    --muted: #79839c;
+    --teal: #46f2c4;
+    --mag: #ff5cbf;
+    --sans: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
+  body { font-family: var(--sans); }
+  #gpu { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+
+  .overlay { position: fixed; inset: 0; pointer-events: none; display: flex; flex-direction: column;
+    justify-content: space-between; padding: clamp(18px, 3.4vw, 40px); }
+  .mark { max-width: 30ch; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase;
+    color: var(--muted); display: flex; align-items: center; gap: 9px; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal);
+    box-shadow: 0 0 10px var(--teal); animation: pulse 2.6s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 0.35; } 50% { opacity: 1; } }
+  h1 { font-size: clamp(40px, 9vw, 128px); font-weight: 200; letter-spacing: 0.14em; margin: 10px 0 0;
+    line-height: 0.98; text-wrap: balance; text-shadow: 0 0 40px rgba(70, 242, 196, 0.12); }
+  .tag { margin: 14px 0 0; color: var(--muted); font-size: clamp(13px, 1.5vw, 16px); max-width: 34ch;
+    line-height: 1.5; }
+
+  .bar { pointer-events: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    background: var(--panel); border: 1px solid var(--stroke); border-radius: 14px;
+    padding: 8px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); width: fit-content; }
+  button { font: 500 13px var(--sans); color: var(--text); background: rgba(255,255,255,0.04);
+    border: 1px solid var(--stroke); border-radius: 9px; padding: 9px 14px; cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, transform 0.05s; }
+  button:hover { background: rgba(255,255,255,0.09); border-color: rgba(150,170,210,0.3); }
+  button:active { transform: translateY(1px); }
+  button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+  .val { font-family: var(--mono); color: var(--teal); }
+  .read { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.06em;
+    padding-left: 6px; border-left: 1px solid var(--stroke); margin-left: 4px; }
+
+  .fallback { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; }
+  .fallback.on { display: grid; }
+  .fallback .card { max-width: 42ch; }
+  .fallback h2 { font-weight: 300; letter-spacing: 0.06em; }
+  .fallback p { color: var(--muted); line-height: 1.6; }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+</style>
+
+<canvas id="gpu"></canvas>
+
+<div class="overlay">
+  <div class="mark">
+    <div class="eyebrow"><span class="dot"></span> <span id="backend">Live</span></div>
+    <h1>Auralis</h1>
+    <p class="tag">A living field of light, generated in real time on your graphics card. Move your cursor to bend the current.</p>
+  </div>
+  <div class="bar">
+    <button id="palette">Palette · <span class="val" id="palName">Aurora</span></button>
+    <button id="mood">Mood · <span class="val" id="moodName">Calm</span></button>
+    <button id="pause">Pause</button>
+    <span class="read" id="fps">— fps</span>
+  </div>
+</div>
+
+<div class="fallback" id="fallback">
+  <div class="card">
+    <h2>Auralis needs a GPU canvas</h2>
+    <p>This browser exposes neither WebGPU nor WebGL2. Open it in a recent Chrome, Edge, Safari, or Firefox on desktop or mobile and the light will appear.</p>
+  </div>
+</div>
+
+<script>
+
+/* ---------- shared shader math (WGSL for WebGPU, GLSL for WebGL2) ---------- */
+</script>
