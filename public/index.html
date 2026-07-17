@@ -197,4 +197,24 @@ async function initWebGPU(canvas) {
   }};
 }
 
+function initWebGL2(canvas) {
+  const gl = canvas.getContext("webgl2", { antialias: false, alpha: false, powerPreference: "high-performance" });
+  if (!gl) return null;
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.error(gl.getShaderInfoLog(s)); return null; } return s; };
+  const vs = sh(gl.VERTEX_SHADER, GL_VERT), fs = sh(gl.FRAGMENT_SHADER, GL_FRAG);
+  if (!vs || !fs) return null;
+  const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(prog)); return null; }
+  gl.bindVertexArray(gl.createVertexArray());
+  const u = n => gl.getUniformLocation(prog, n);
+  const L = { res: u("uRes"), time: u("uTime"), mood: u("uMood"), mouse: u("uMouse"), energy: u("uEnergy"), pal: u("uPal") };
+  return { name: "WebGL2", draw(s) {
+    gl.viewport(0, 0, s.W, s.H); gl.useProgram(prog);
+    gl.uniform2f(L.res, s.W, s.H); gl.uniform1f(L.time, s.t); gl.uniform1f(L.mood, s.mood);
+    gl.uniform2f(L.mouse, s.mx, s.my); gl.uniform1f(L.energy, s.energy); gl.uniform1f(L.pal, s.pal);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }};
+}
+
 </script>
