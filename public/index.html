@@ -217,4 +217,42 @@ function initWebGL2(canvas) {
   }};
 }
 
+(async () => {
+  const canvas = document.getElementById("gpu");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let renderer = null;
+  try { renderer = await initWebGPU(canvas); } catch (e) { /* fall through */ }
+  if (!renderer) renderer = initWebGL2(canvas);
+  if (!renderer) { document.getElementById("fallback").classList.add("on"); return; }
+  document.getElementById("backend").textContent = "Live · " + renderer.name + " · runs on your GPU";
+
+  const s = { W: 1, H: 1, mx: 0.5, my: 0.5, tmx: 0.5, tmy: 0.5, energy: 0, tEnergy: 0, t: 0, pal: 0, mood: 0, paused: false };
+  function resize() { const dpr = Math.min(devicePixelRatio || 1, 2);
+    s.W = Math.max(1, Math.floor(innerWidth * dpr)); s.H = Math.max(1, Math.floor(innerHeight * dpr));
+    canvas.width = s.W; canvas.height = s.H; }
+  addEventListener("resize", resize); resize();
+
+  const pointer = (x, y, boost) => { s.tmx = x / innerWidth; s.tmy = y / innerHeight; s.tEnergy = boost; };
+  addEventListener("pointermove", e => pointer(e.clientX, e.clientY, 1));
+  addEventListener("pointerdown", e => pointer(e.clientX, e.clientY, 1.6));
+
+  const palName = document.getElementById("palName"), moodName = document.getElementById("moodName"), fpsEl = document.getElementById("fps");
+  document.getElementById("palette").onclick = () => { s.pal = (s.pal + 1) % PALETTES.length; palName.textContent = PALETTES[s.pal]; };
+  document.getElementById("mood").onclick = () => { s.mood = s.mood ? 0 : 1; moodName.textContent = MOODS[s.mood]; };
+  const pauseBtn = document.getElementById("pause");
+  pauseBtn.onclick = () => { s.paused = !s.paused; pauseBtn.textContent = s.paused ? "Play" : "Pause"; };
+
+  let last = performance.now(), frames = 0, facc = 0;
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (!s.paused) s.t += dt * (reduce ? 0.15 : 1);
+    s.mx += (s.tmx - s.mx) * 0.08; s.my += (s.tmy - s.my) * 0.08;
+    s.tEnergy *= 0.94; s.energy += (s.tEnergy - s.energy) * 0.12;
+    renderer.draw(s);
+    frames++; facc += dt;
+    if (facc >= 0.5) { fpsEl.textContent = Math.round(frames / facc) + " fps"; frames = 0; facc = 0; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
 </script>
