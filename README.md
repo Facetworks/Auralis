@@ -13,3 +13,10 @@ An interactive aurora: domain-warped fractal noise (FBM) mapped through cosine p
 - Four palettes (Aurora, Ember, Ice, Bloom), Calm / Storm turbulence, pause, and a live fps readout
 - One self-contained HTML file: no dependencies, no build
 
+## How it works
+
+- A full-screen triangle drives a fragment shader.
+- The shader layers value-noise **FBM**, warps the domain twice for the flowing look, and colors the result with an Inigo Quilez **cosine palette**.
+- The cursor feeds a uniform that adds local energy and bends the flow.
+- The **WGSL** (WebGPU) and **GLSL** (WebGL2) shaders are kept in sync so both paths look identical.
+
