@@ -20,3 +20,11 @@ An interactive aurora: domain-warped fractal noise (FBM) mapped through cosine p
 - The cursor feeds a uniform that adds local energy and bends the flow.
 - The **WGSL** (WebGPU) and **GLSL** (WebGL2) shaders are kept in sync so both paths look identical.
 
+## Run locally
+
+Open `public/index.html` in a browser, or serve the folder:
+
+```bash
+npx serve public
+```
+
