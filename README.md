@@ -28,3 +28,6 @@ Open `public/index.html` in a browser, or serve the folder:
 npx serve public
 ```
 
+## License
+
+MIT
