@@ -5,7 +5,7 @@ Thanks for helping improve **Auralis**. Bug reports, fixes, and features are all
 ## Getting set up
 
 ```bash
-git clone https://github.com/royalpinto007/Auralis
+git clone https://github.com/Facetworks/Auralis
 cd Auralis
 # no build step — open `public/index.html` in a browser, or `npx serve public`
 ```
