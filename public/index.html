@@ -41,6 +41,8 @@
   .read { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: 0.06em;
     padding-left: 6px; border-left: 1px solid var(--stroke); margin-left: 4px; }
 
+  .src{position:absolute;top:clamp(16px,3.2vw,38px);right:clamp(16px,3.2vw,38px);pointer-events:auto;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;border:1px solid var(--stroke);border-radius:9px;padding:9px 13px;background:var(--panel);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .src:hover{color:var(--text);border-color:rgba(255,255,255,.35)}
   .fallback { position: fixed; inset: 0; display: none; place-items: center; text-align: center; padding: 24px; }
   .fallback.on { display: grid; }
   .fallback .card { max-width: 42ch; }
@@ -52,6 +54,7 @@
 <canvas id="gpu"></canvas>
 
 <div class="overlay">
+  <a class="src" href="https://github.com/Facetworks/Auralis" target="_blank" rel="noopener">Source &#8599;</a>
   <div class="mark">
     <div class="eyebrow"><span class="dot"></span> <span id="backend">Live</span></div>
     <h1>Auralis</h1>
