@@ -2,7 +2,7 @@
 
 **A living field of light, rendered in real time on your GPU — right in the browser.** WebGPU when your browser has it, a WebGL2 fallback when it doesn't, so it runs almost anywhere. No server, no dependencies, no build step.
 
-**→ Live: https://auralis.agentpostmortem.com**
+**→ Live: https://auralis.signalizeai.org**
 
 ## What it is
 
