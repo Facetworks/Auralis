@@ -1,3 +1,4 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
   :root {
     --bg: #05060a;
@@ -13,7 +14,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); overflow: hidden; }
   body { font-family: var(--sans); }
-  #gpu { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #gpu { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; touch-action: none; }
 
   .overlay { position: fixed; inset: 0; pointer-events: none; display: flex; flex-direction: column;
     justify-content: space-between; padding: clamp(18px, 3.4vw, 40px); }
@@ -30,7 +31,7 @@
 
   .bar { pointer-events: auto; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
     background: var(--panel); border: 1px solid var(--stroke); border-radius: 14px;
-    padding: 8px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); width: fit-content; }
+    padding: 8px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); width: fit-content; max-width: calc(100vw - 32px); overflow-x: auto; }
   button { font: 500 13px var(--sans); color: var(--text); background: rgba(255,255,255,0.04);
     border: 1px solid var(--stroke); border-radius: 9px; padding: 9px 14px; cursor: pointer;
     transition: background 0.18s, border-color 0.18s, transform 0.05s; }
@@ -76,6 +77,10 @@
 </div>
 
 <script>
+/* Mobile coarse-pointer/quality flags must live at top level: the WGSL and
+   GLSL sources below interpolate OCT when they are evaluated. */
+const MOBILE = matchMedia("(pointer:coarse)").matches || Math.min(innerWidth, innerHeight) < 500 || /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent);
+const OCT = MOBILE ? 4 : 6; // fewer fbm octaves on phones
 /* ---------- shared shader math (WGSL for WebGPU, GLSL for WebGL2) ---------- */
 const WGSL = `
 struct U { res: vec2<f32>, time: f32, mood: f32, mouse: vec2<f32>, energy: f32, pal: f32 };
@@ -91,7 +96,7 @@ fn vnoise(p: vec2<f32>) -> f32 {
   return mix(mix(a,b,w.x), mix(c,d,w.x), w.y);
 }
 fn fbm(p0: vec2<f32>) -> f32 { var p=p0; var v=0.0; var a=0.5;
-  for (var i=0; i<6; i=i+1) { v=v+a*vnoise(p); p=p*2.02+vec2<f32>(3.1,1.7); a=a*0.5; } return v; }
+  for (var i=0; i<${OCT}; i=i+1) { v=v+a*vnoise(p); p=p*2.02+vec2<f32>(3.1,1.7); a=a*0.5; } return v; }
 fn pal(t:f32,a:vec3<f32>,b:vec3<f32>,c:vec3<f32>,d:vec3<f32>) -> vec3<f32> { return a + b*cos(6.28318530718*(c*t+d)); }
 fn palette(idx:f32, t:f32) -> vec3<f32> {
   let i = i32(idx+0.5);
@@ -135,7 +140,7 @@ float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); 
 float vnoise(vec2 p){ vec2 i=floor(p); vec2 f=fract(p); vec2 w=f*f*(3.0-2.0*f);
   float a=hash(i); float b=hash(i+vec2(1,0)); float c=hash(i+vec2(0,1)); float d=hash(i+vec2(1,1));
   return mix(mix(a,b,w.x),mix(c,d,w.x),w.y); }
-float fbm(vec2 p){ float v=0.0; float a=0.5; for(int i=0;i<6;i++){ v+=a*vnoise(p); p=p*2.02+vec2(3.1,1.7); a*=0.5; } return v; }
+float fbm(vec2 p){ float v=0.0; float a=0.5; for(int i=0;i<${OCT};i++){ v+=a*vnoise(p); p=p*2.02+vec2(3.1,1.7); a*=0.5; } return v; }
 vec3 pal(float t, vec3 a, vec3 b, vec3 c, vec3 d){ return a+b*cos(6.28318530718*(c*t+d)); }
 vec3 palette(float idx, float t){ int i=int(idx+0.5);
   if(i==1) return pal(t, vec3(0.5,0.28,0.2), vec3(0.5,0.35,0.25), vec3(1.0), vec3(0.0,0.12,0.2));
@@ -229,7 +234,7 @@ function initWebGL2(canvas) {
   document.getElementById("backend").textContent = "Live · " + renderer.name + " · runs on your GPU";
 
   const s = { W: 1, H: 1, mx: 0.5, my: 0.5, tmx: 0.5, tmy: 0.5, energy: 0, tEnergy: 0, t: 0, pal: 0, mood: 0, paused: false };
-  function resize() { const dpr = Math.min(devicePixelRatio || 1, 2);
+  function resize() { const dpr = Math.min(devicePixelRatio || 1, MOBILE ? 1 : 1.5);
     s.W = Math.max(1, Math.floor(innerWidth * dpr)); s.H = Math.max(1, Math.floor(innerHeight * dpr));
     canvas.width = s.W; canvas.height = s.H; }
   addEventListener("resize", resize); resize();
